@@ -1,4 +1,4 @@
-package pe.edu.upeu.SALSYS7SEAS;
+package pe.edu.upeu.SALSYS7SEAS.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,39 +18,39 @@ import java.util.Map;
 
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories( entityManagerFactoryRef = "mysqlEntityManagerFactory",
-        transactionManagerRef = "mysqlTransactionManager", basePackages = {
-        "pe.edu.upeu.SALSYS7SEAS.gestionUsuariosDB.usuario.dao"
+@EnableJpaRepositories( entityManagerFactoryRef = "postgresEntityManagerFactory",
+        transactionManagerRef = "postgresTransactionManager", basePackages = {
+        "pe.edu.upeu.SALSYS7SEAS.negocioDB.dao"
 })
-public class MysqlConfig {
+public class PostgresConfig {
 
     @Autowired
     private Environment environment;
 
-    @Bean(name = "mysqlDatasource")
+    @Bean(name = "postgresDatasource")
     public DataSource mysqlDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl(environment.getProperty("mysql.datasource.url"));
-        dataSource.setUsername(environment.getProperty("mysql.datasource.username"));
-        dataSource.setPassword(environment.getProperty("mysql.datasource.password"));
-        dataSource.setDriverClassName(environment.getProperty("mysql.datasource.driver-class-name"));
+        dataSource.setUrl(environment.getProperty("postgres.datasource.url"));
+        dataSource.setUsername(environment.getProperty("postgres.datasource.username"));
+        dataSource.setPassword(environment.getProperty("postgres.datasource.password"));
+        dataSource.setDriverClassName(environment.getProperty("postgres.datasource.driver-class-name"));
 
         return dataSource;
     }
 
-    @Bean(name = "mysqlEntityManagerFactory")
+    @Bean(name = "postgresEntityManagerFactory")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(mysqlDataSource());
-        em.setPackagesToScan("pe.edu.upeu.SALSYS7SEAS.gestionUsuariosDB.usuario.entity");
+        em.setPackagesToScan("pe.edu.upeu.SALSYS7SEAS.negocioDB.entity");
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
 
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", environment.getProperty("mysql.jpa.hibernate.ddl-auto"));
-        properties.put("hibernate.show-sql", environment.getProperty("mysql.jpa.show-sql"));
-        properties.put("hibernate.dialect", environment.getProperty("mysql.jpa.database-platform"));
+        properties.put("hibernate.hbm2ddl.auto", environment.getProperty("postgres.jpa.hibernate.ddl-auto"));
+        properties.put("hibernate.show-sql", environment.getProperty("postgres.jpa.show-sql"));
+        properties.put("hibernate.dialect", environment.getProperty("postgres.jpa.database-platform"));
 
         em.setJpaPropertyMap(properties);
 
@@ -58,7 +58,7 @@ public class MysqlConfig {
 
     }
 
-    @Bean(name = "mysqlTransactionManager")
+    @Bean(name = "postgresTransactionManager")
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
